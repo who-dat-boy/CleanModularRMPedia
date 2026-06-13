@@ -6,7 +6,7 @@
 //
 
 protocol FetchCharactersUseCase {
-    func execute(forPage page: Int) async throws -> [RMCharacter]
+    func execute(forPage page: Int) async throws -> ([RMCharacter], Bool)
 }
 
 struct FetchCharactersUseCaseImpl: FetchCharactersUseCase {
@@ -16,7 +16,7 @@ struct FetchCharactersUseCaseImpl: FetchCharactersUseCase {
         self.charactersRepository = charactersRepository
     }
     
-    func execute(forPage page: Int) async throws -> [RMCharacter] {
+    func execute(forPage page: Int) async throws -> ([RMCharacter], Bool) {
         try await charactersRepository.fetchCharacters(forPage: page)
     }
 }

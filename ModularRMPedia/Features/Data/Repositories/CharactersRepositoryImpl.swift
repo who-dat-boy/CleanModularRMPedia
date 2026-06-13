@@ -8,9 +8,9 @@
 struct CharactersRepositoryImpl: CharactersRepository {
     let remoteDataSource: CharactersClientDataSource
     
-    func fetchCharacters(forPage page: Int) async throws -> [RMCharacter] {
+    func fetchCharacters(forPage page: Int) async throws -> ([RMCharacter], Bool) {
         let root = try await remoteDataSource.fetchCharacters(forPage: page)
-        return characters(from: root)
+        return (characters(from: root), root.info.next == nil)
     }
     
     func characters(from root: Root) -> [RMCharacter] {

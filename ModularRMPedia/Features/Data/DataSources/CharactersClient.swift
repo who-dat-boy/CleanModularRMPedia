@@ -32,7 +32,6 @@ struct CharactersClientDataSourceImpl: CharactersClientDataSource {
 #if DEBUG
             print("failed to get url")
 #endif
-            
             throw URLError(.badURL)
         }
         

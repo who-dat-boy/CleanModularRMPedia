@@ -9,9 +9,8 @@ import Foundation
 import Combine
 
 class CharactersListViewModel: ObservableObject {
-    @Published var characters: [RMCharacterUIModel] = []
-    @Published var canLoadMore: Bool = false
-    var currentPage: Int = 0
+    @Published var viewItem = ViewItem(characters: [], canLoadMore: false, isLoading: false)
+    var currentPage: Int = 40
     
     private let fetchCharactersUseCase: FetchCharactersUseCase
     init(fetchCharactersUseCase: FetchCharactersUseCase) {
@@ -19,7 +18,7 @@ class CharactersListViewModel: ObservableObject {
     }
     
     func fetchFirstCharacters() {
-        self.fetchCharacters(forPage: 1)
+        self.fetchCharacters(forPage: 41)
     }
     
     func loadMore() {
@@ -28,18 +27,45 @@ class CharactersListViewModel: ObservableObject {
     
     private func fetchCharacters(forPage page: Int) {
         print("fetching for \(page)")
+        startLoading()
+        
         Task {
             try? await Task.sleep(for: .seconds(2))
             
             do {
-                let useCaseEntities = try await fetchCharactersUseCase.execute(forPage: page)
+                let (useCaseEntities, isLast) = try await fetchCharactersUseCase.execute(forPage: page)
                 let newCharacters = useCaseEntities.map { RMCharacterUIModel(from: $0) }
-                characters.append(contentsOf: newCharacters)
+                
+                let viewItem = ViewItem(
+                    characters: viewItem.characters + newCharacters,
+                    canLoadMore: !isLast,
+                    isLoading: false
+                )
+                
+                self.viewItem = viewItem
                 currentPage += 1
             } catch {
                 print(error)
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    private func startLoading() {
+        let viewItem = ViewItem(
+            characters: viewItem.characters,
+            canLoadMore: viewItem.canLoadMore,
+            isLoading: true
+        )
+        
+        self.viewItem = viewItem
+    }
+}
+
+extension CharactersListViewModel {
+    struct ViewItem {
+        let characters: [RMCharacterUIModel]
+        let canLoadMore: Bool
+        let isLoading: Bool
     }
 }

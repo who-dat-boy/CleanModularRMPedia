@@ -17,24 +17,35 @@ struct CharactersListView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                if viewModel.characters.isEmpty {
+                if viewModel.viewItem.characters.isEmpty {
                     CharactersListSkeleton()
                         .padding(.horizontal)
                 } else {
                     LazyVStack(spacing: 10) {
-                        ForEach(viewModel.characters) { character in
+                        ForEach(viewModel.viewItem.characters) { character in
                             CharactersListCell(
                                 state: .result(character)
                             )
                         }
                         
-                        Button("Load more", action: viewModel.loadMore)
+                        loadMoreButton()
                     }
                     .padding(.horizontal)
                 }
             }
             .navigationTitle("Rick & Morty Wiki")
             .onAppear(perform: viewModel.fetchFirstCharacters)
+        }
+    }
+    
+    @ViewBuilder
+    func loadMoreButton() -> some View {
+        if viewModel.viewItem.canLoadMore {
+            if viewModel.viewItem.isLoading {
+                ProgressView()
+            } else {
+                Button("Load more", action: viewModel.loadMore)
+            }
         }
     }
 }

@@ -6,5 +6,5 @@
 //
 
 protocol CharactersRepository {
-    func fetchCharacters(forPage page: Int) async throws -> [RMCharacter]
+    func fetchCharacters(forPage page: Int) async throws -> ([RMCharacter], Bool)
 }
